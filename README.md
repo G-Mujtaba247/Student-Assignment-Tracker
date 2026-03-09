@@ -1,1 +1,2 @@
 # Student-Assignment-Tracker
+The Student Assignment Tracker is a simple web application built using the MERN Stack (MongoDB, Express.js, React, and Node.js). It helps students organize and manage their academic assignments in one place. Users can create an account, add new assignments with details such as subject, title, and due date, and track their progress. The system allows students to update, delete, or mark assignments as completed. A simple dashboard shows pending and completed tasks, helping students stay organized and complete their work on time.
