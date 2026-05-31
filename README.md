@@ -45,6 +45,9 @@ Required variables:
 PORT=5000
 MONGO_URI=mongodb://127.0.0.1:27017/student-assignment-tracker
 JWT_SECRET=your_jwt_secret_here
+ADMIN_EMAIL=admin@school.com
 ```
+
+When a new user registers with the email from `ADMIN_EMAIL`, they are granted admin access and can use the admin dashboard.
 
 The frontend uses `http://localhost:5000/api` by default.

@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import authRoutes from './routes/auth.js';
 import assignmentRoutes from './routes/assignments.js';
+import adminRoutes from './routes/admin.js';
 
 dotenv.config();
 const app = express();
@@ -14,6 +15,7 @@ app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/assignments', assignmentRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.use((req, res, next) => {
   res.status(404).json({ message: 'Resource not found' });

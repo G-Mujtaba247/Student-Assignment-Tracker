@@ -65,6 +65,9 @@ function Dashboard() {
           <p>Welcome back, {user?.name}! Manage student assignments with ease.</p>
         </div>
         <div className="nav-actions">
+          {user?.role === 'admin' && (
+            <button className="secondary" onClick={() => navigate('/admin')}>Admin dashboard</button>
+          )}
           <button className="secondary" onClick={handleLogout}>Logout</button>
         </div>
       </div>

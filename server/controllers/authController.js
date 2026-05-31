@@ -21,9 +21,13 @@ export const registerUser = async (req, res, next) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const user = await User.create({ name, email, password: hashedPassword });
+        const role = process.env.ADMIN_EMAIL && email.toLowerCase() === process.env.ADMIN_EMAIL.toLowerCase()
+      ? 'admin'
+      : 'user';
+
+    const user = await User.create({ name, email, password: hashedPassword, role });
     res.status(201).json({
-      user: { id: user._id, name: user.name, email: user.email },
+      user: { id: user._id, name: user.name, email: user.email, role: user.role },
       token: generateToken(user._id),
     });
   } catch (error) {
@@ -44,7 +48,7 @@ export const loginUser = async (req, res, next) => {
     }
 
     res.json({
-      user: { id: user._id, name: user.name, email: user.email },
+      user: { id: user._id, name: user.name, email: user.email, role: user.role },
       token: generateToken(user._id),
     });
   } catch (error) {
