@@ -1,7 +1,14 @@
 import api from '../api.js';
 
 function AssignmentList({ assignments, onUpdate, onDelete }) {
+  const statusOptions = [
+    { value: 'pending', label: 'Pending' },
+    { value: 'in progress', label: 'In Progress' },
+    { value: 'completed', label: 'Completed' },
+  ];
+
   const updateStatus = async (assignment, status) => {
+    if (assignment.status === status) return;
     const response = await api.put(`/assignments/${assignment._id}`, { status });
     onUpdate(response.data);
   };
@@ -12,24 +19,35 @@ function AssignmentList({ assignments, onUpdate, onDelete }) {
   };
 
   if (!assignments.length) {
-    return <p>No assignments created yet. Add one above to start tracking.</p>;
+    return <p>No assignments match your current filters. Adjust the search or add a new assignment.</p>;
   }
 
   return (
     <div className="assignment-grid">
       {assignments.map(item => (
         <div key={item._id} className="assignment-card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
-            <h3>{item.title}</h3>
-            <span className="meta">{item.status}</span>
+          <div className="assignment-header">
+            <div>
+              <h3>{item.title}</h3>
+              <p className="meta">Student: {item.studentName || 'Unassigned'}</p>
+            </div>
+            <span className={`status-chip status-${item.status.replace(' ', '-')}`}>{item.status}</span>
           </div>
-          <p className="meta">Student: {item.studentName || 'Unassigned'}</p>
+
           {item.description && <p>{item.description}</p>}
           <p className="meta">Due: {item.dueDate ? new Date(item.dueDate).toLocaleDateString() : 'No due date'}</p>
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
-            <button onClick={() => updateStatus(item, 'pending')} className="secondary">Pending</button>
-            <button onClick={() => updateStatus(item, 'in progress')} className="secondary">In Progress</button>
-            <button onClick={() => updateStatus(item, 'completed')} className="secondary">Completed</button>
+
+          <div className="action-row">
+            {statusOptions.map(status => (
+              <button
+                key={status.value}
+                onClick={() => updateStatus(item, status.value)}
+                className={item.status === status.value ? 'secondary active' : 'secondary'}
+                disabled={item.status === status.value}
+              >
+                {status.label}
+              </button>
+            ))}
             <button onClick={() => removeAssignment(item._id)} className="danger">Delete</button>
           </div>
         </div>

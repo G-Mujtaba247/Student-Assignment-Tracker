@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api.js';
 
@@ -8,6 +8,8 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [userSearch, setUserSearch] = useState('');
+  const [assignmentSearch, setAssignmentSearch] = useState('');
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('sat_user') || 'null');
 
@@ -53,6 +55,29 @@ function AdminDashboard() {
     }
   };
 
+  const filteredUsers = useMemo(() => {
+    const query = userSearch.trim().toLowerCase();
+    return users.filter(u =>
+      u.name.toLowerCase().includes(query) || u.email.toLowerCase().includes(query) || u.role.toLowerCase().includes(query)
+    );
+  }, [users, userSearch]);
+
+  const filteredAssignments = useMemo(() => {
+    const query = assignmentSearch.trim().toLowerCase();
+    return assignments.filter(a =>
+      a.title.toLowerCase().includes(query) ||
+      (a.studentName || '').toLowerCase().includes(query) ||
+      (a.createdBy?.name || '').toLowerCase().includes(query)
+    );
+  }, [assignments, assignmentSearch]);
+
+  const stats = {
+    users: users.length,
+    assignments: assignments.length,
+    pending: assignments.filter(a => a.status === 'pending').length,
+    completed: assignments.filter(a => a.status === 'completed').length,
+  };
+
   return (
     <div className="page-card">
       <div className="header-row">
@@ -66,6 +91,40 @@ function AdminDashboard() {
         </div>
       </div>
 
+      <div className="summary-grid">
+        <div className="summary-card">
+          <span>Users</span>
+          <strong>{stats.users}</strong>
+        </div>
+        <div className="summary-card">
+          <span>Assignments</span>
+          <strong>{stats.assignments}</strong>
+        </div>
+        <div className="summary-card">
+          <span>Pending</span>
+          <strong>{stats.pending}</strong>
+        </div>
+        <div className="summary-card">
+          <span>Completed</span>
+          <strong>{stats.completed}</strong>
+        </div>
+      </div>
+
+      <div className="filter-row">
+        <input
+          type="search"
+          placeholder="Search users"
+          value={userSearch}
+          onChange={e => setUserSearch(e.target.value)}
+        />
+        <input
+          type="search"
+          placeholder="Search assignments"
+          value={assignmentSearch}
+          onChange={e => setAssignmentSearch(e.target.value)}
+        />
+      </div>
+
       {message && <div className="alert">{message}</div>}
       {error && <div className="alert">{error}</div>}
 
@@ -75,10 +134,10 @@ function AdminDashboard() {
         <>
           <section className="assignment-card" style={{ marginBottom: '24px' }}>
             <h2>Users</h2>
-            {users.length ? (
+            {filteredUsers.length ? (
               <div className="assignment-grid">
-                {users.map(u => (
-                  <div key={u._id} className="assignment-card">
+                {filteredUsers.map(u => (
+                  <div key={u._id} className="assignment-card user-card">
                     <h3>{u.name}</h3>
                     <p className="meta">{u.email}</p>
                     <p className="meta">Role: {u.role}</p>
@@ -86,21 +145,23 @@ function AdminDashboard() {
                 ))}
               </div>
             ) : (
-              <p>No users found.</p>
+              <p>No users match your search.</p>
             )}
           </section>
 
           <section className="assignment-card">
             <h2>All Assignments</h2>
-            {assignments.length ? (
+            {filteredAssignments.length ? (
               <div className="assignment-grid">
-                {assignments.map(a => (
+                {filteredAssignments.map(a => (
                   <div key={a._id} className="assignment-card">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
-                      <h3>{a.title}</h3>
-                      <span className="meta">{a.status}</span>
+                    <div className="assignment-header">
+                      <div>
+                        <h3>{a.title}</h3>
+                        <p className="meta">Owner: {a.createdBy?.name || 'Unknown'} ({a.createdBy?.email})</p>
+                      </div>
+                      <span className={`status-chip status-${a.status.replace(' ', '-')}`}>{a.status}</span>
                     </div>
-                    <p className="meta">Owner: {a.createdBy?.name || 'Unknown'} ({a.createdBy?.email})</p>
                     <p className="meta">Student: {a.studentName || 'Unassigned'}</p>
                     {a.description && <p>{a.description}</p>}
                     <p className="meta">Due: {a.dueDate ? new Date(a.dueDate).toLocaleDateString() : 'No due date'}</p>
@@ -109,7 +170,7 @@ function AdminDashboard() {
                 ))}
               </div>
             ) : (
-              <p>No assignments found.</p>
+              <p>No assignments match your search.</p>
             )}
           </section>
         </>
