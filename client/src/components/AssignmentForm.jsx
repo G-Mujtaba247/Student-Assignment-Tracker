@@ -35,7 +35,8 @@ function AssignmentForm({ onAdd }) {
   return (
     <div className="assignment-card" style={{ marginBottom: '24px' }}>
       <h2>Create a new assignment</h2>
-      {error && <div className="alert">{error}</div>}
+      <p className="section-note">Fill in the task details and assign it to a student. Due dates help keep everything on schedule.</p>
+      {error && <div className="alert error">{error}</div>}
       <form onSubmit={handleSubmit} className="form-grid">
         <input
           type="text"

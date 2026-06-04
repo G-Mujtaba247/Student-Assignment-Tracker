@@ -83,7 +83,7 @@ function AdminDashboard() {
       <div className="header-row">
         <div>
           <h1 className="page-title">Admin Dashboard</h1>
-          <p>Welcome, {user?.name}. Monitor users and assignments.</p>
+          <p className="subtitle">Welcome, {user?.name}. Monitor users, assignments, and keep the team aligned with fast admin actions.</p>
         </div>
         <div className="nav-actions">
           <button className="secondary" onClick={() => navigate('/')}>Back to tracker</button>
@@ -125,8 +125,8 @@ function AdminDashboard() {
         />
       </div>
 
-      {message && <div className="alert">{message}</div>}
-      {error && <div className="alert">{error}</div>}
+      {message && <div className="alert success">{message}</div>}
+      {error && <div className="alert error">{error}</div>}
 
       {loading ? (
         <p>Loading admin data...</p>

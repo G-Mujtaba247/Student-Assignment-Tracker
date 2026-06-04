@@ -26,7 +26,8 @@ function Register() {
   return (
     <div className="page-card">
       <h1 className="page-title">Register</h1>
-      {error && <div className="alert">{error}</div>}
+      <p className="subtitle">Create your account and start assigning tasks, tracking progress, and staying organized.</p>
+      {error && <div className="alert error">{error}</div>}
       <form onSubmit={handleSubmit} className="form-grid">
         <input
           type="text"

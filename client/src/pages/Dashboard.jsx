@@ -98,7 +98,7 @@ function Dashboard() {
       <div className="header-row">
         <div>
           <h1 className="page-title">Assignment Tracker</h1>
-          <p>Welcome back, {user?.name}! Manage student assignments with ease.</p>
+          <p className="subtitle">Welcome back, {user?.name}! Use the controls below to search, filter, and keep every assignment on track.</p>
         </div>
         <div className="nav-actions">
           {user?.role === 'admin' && (
@@ -146,8 +146,8 @@ function Dashboard() {
         </select>
       </div>
 
-      {message && <div className="alert">{message}</div>}
-      {error && <div className="alert">{error}</div>}
+      {message && <div className="alert success">{message}</div>}
+      {error && <div className="alert error">{error}</div>}
 
       <AssignmentForm onAdd={handleAdd} />
 

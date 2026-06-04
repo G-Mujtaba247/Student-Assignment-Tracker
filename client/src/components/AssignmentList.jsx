@@ -19,7 +19,11 @@ function AssignmentList({ assignments, onUpdate, onDelete }) {
   };
 
   if (!assignments.length) {
-    return <p>No assignments match your current filters. Adjust the search or add a new assignment.</p>;
+    return (
+      <div className="empty-state">
+        <p>No assignments match your current filters yet. Try adjusting the search, changing the status filter, or adding a new assignment.</p>
+      </div>
+    );
   }
 
   return (

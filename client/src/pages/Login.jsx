@@ -25,7 +25,8 @@ function Login() {
   return (
     <div className="page-card">
       <h1 className="page-title">Login</h1>
-      {error && <div className="alert">{error}</div>}
+      <p className="subtitle">Access your assignment board and keep track of progress in one simple workflow.</p>
+      {error && <div className="alert error">{error}</div>}
       <form onSubmit={handleSubmit} className="form-grid">
         <input
           type="email"
