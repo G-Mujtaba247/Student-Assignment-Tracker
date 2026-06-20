@@ -1,27 +1,40 @@
 import api from '../api.js';
+import './AssignmentList.css';
 
 function AssignmentList({ assignments, onUpdate, onDelete }) {
   const statusOptions = [
-    { value: 'pending', label: 'Pending' },
-    { value: 'in progress', label: 'In Progress' },
-    { value: 'completed', label: 'Completed' },
+    { value: 'pending', label: '⏳ Pending', icon: '⏳' },
+    { value: 'in progress', label: '🚀 In Progress', icon: '🚀' },
+    { value: 'completed', label: '✅ Completed', icon: '✅' },
   ];
 
   const updateStatus = async (assignment, status) => {
     if (assignment.status === status) return;
-    const response = await api.put(`/assignments/${assignment._id}`, { status });
-    onUpdate(response.data);
+    try {
+      const response = await api.put(`/assignments/${assignment._id}`, { status });
+      onUpdate(response.data);
+    } catch (err) {
+      console.error('Error updating status:', err);
+    }
   };
 
   const removeAssignment = async id => {
-    await api.delete(`/assignments/${id}`);
-    onDelete(id);
+    if (confirm('Are you sure you want to delete this assignment?')) {
+      try {
+        await api.delete(`/assignments/${id}`);
+        onDelete(id);
+      } catch (err) {
+        console.error('Error deleting assignment:', err);
+      }
+    }
   };
 
   if (!assignments.length) {
     return (
       <div className="empty-state">
-        <p>No assignments match your current filters yet. Try adjusting the search, changing the status filter, or adding a new assignment.</p>
+        <div className="empty-state-icon">📚</div>
+        <p><strong>No assignments found</strong></p>
+        <p>Try adjusting your filters or create a new assignment to get started!</p>
       </div>
     );
   }
@@ -33,13 +46,18 @@ function AssignmentList({ assignments, onUpdate, onDelete }) {
           <div className="assignment-header">
             <div>
               <h3>{item.title}</h3>
-              <p className="meta">Student: {item.studentName || 'Unassigned'}</p>
+              <p className="meta">👤 {item.studentName || 'Unassigned'}</p>
             </div>
-            <span className={`status-chip status-${item.status.replace(' ', '-')}`}>{item.status}</span>
+            <span className={`status-chip status-${item.status.replace(' ', '-')}`}>
+              {statusOptions.find(s => s.value === item.status)?.label}
+            </span>
           </div>
 
-          {item.description && <p>{item.description}</p>}
-          <p className="meta">Due: {item.dueDate ? new Date(item.dueDate).toLocaleDateString() : 'No due date'}</p>
+          {item.description && <p className="description">{item.description}</p>}
+          
+          <div className="assignment-meta">
+            <p className="meta">📅 Due: {item.dueDate ? new Date(item.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'No due date'}</p>
+          </div>
 
           <div className="action-row">
             {statusOptions.map(status => (
@@ -48,11 +66,18 @@ function AssignmentList({ assignments, onUpdate, onDelete }) {
                 onClick={() => updateStatus(item, status.value)}
                 className={item.status === status.value ? 'secondary active' : 'secondary'}
                 disabled={item.status === status.value}
+                title={`Mark as ${status.label}`}
               >
-                {status.label}
+                {status.icon}
               </button>
             ))}
-            <button onClick={() => removeAssignment(item._id)} className="danger">Delete</button>
+            <button 
+              onClick={() => removeAssignment(item._id)} 
+              className="danger"
+              title="Delete assignment"
+            >
+              🗑️
+            </button>
           </div>
         </div>
       ))}

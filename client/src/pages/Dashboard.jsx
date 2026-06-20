@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api.js';
+import Header from '../components/Header.jsx';
 import AssignmentForm from '../components/AssignmentForm.jsx';
 import AssignmentList from '../components/AssignmentList.jsx';
+import './Dashboard.css';
 
 function Dashboard() {
   const [assignments, setAssignments] = useState([]);
@@ -12,6 +14,7 @@ function Dashboard() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSortBy] = useState('dueDate');
+  const [showForm, setShowForm] = useState(false);
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('sat_user') || 'null');
 
@@ -44,19 +47,20 @@ function Dashboard() {
 
   const handleAdd = newAssignment => {
     setAssignments(prev => [newAssignment, ...prev]);
-    setMessage('Assignment added successfully.');
+    setMessage('✅ Assignment added successfully.');
+    setShowForm(false);
     window.setTimeout(() => setMessage(''), 3500);
   };
 
   const handleUpdate = updated => {
     setAssignments(prev => prev.map(item => (item._id === updated._id ? updated : item)));
-    setMessage('Assignment updated.');
+    setMessage('✏️ Assignment updated.');
     window.setTimeout(() => setMessage(''), 3500);
   };
 
   const handleDelete = id => {
     setAssignments(prev => prev.filter(item => item._id !== id));
-    setMessage('Assignment removed.');
+    setMessage('🗑️ Assignment removed.');
     window.setTimeout(() => setMessage(''), 3500);
   };
 
@@ -94,73 +98,84 @@ function Dashboard() {
   };
 
   return (
-    <div className="page-card">
-      <div className="header-row">
-        <div>
-          <h1 className="page-title">Assignment Tracker</h1>
-          <p className="subtitle">Welcome back, {user?.name}! Use the controls below to search, filter, and keep every assignment on track.</p>
-        </div>
-        <div className="nav-actions">
-          {user?.role === 'admin' && (
-            <button className="secondary" onClick={() => navigate('/admin')}>Admin dashboard</button>
+    <>
+      <Header
+        title="Assignment Tracker"
+        subtitle="Welcome back! Manage your assignments and track progress at a glance."
+        user={user}
+        showAdminLink={true}
+        onLogout={handleLogout}
+      />
+      <div className="app-shell">
+        <div className="page-card">
+          {/* Summary Cards */}
+          <div className="summary-grid">
+            <div className="summary-card">
+              <span>📊 Total</span>
+              <strong>{summary.total}</strong>
+            </div>
+            <div className="summary-card">
+              <span>⏳ Pending</span>
+              <strong>{summary.pending}</strong>
+            </div>
+            <div className="summary-card">
+              <span>🚀 In Progress</span>
+              <strong>{summary.inProgress}</strong>
+            </div>
+            <div className="summary-card">
+              <span>✅ Completed</span>
+              <strong>{summary.completed}</strong>
+            </div>
+          </div>
+
+          {/* Alerts */}
+          {message && <div className="alert success"><span>✓</span> {message}</div>}
+          {error && <div className="alert error"><span>✕</span> {error}</div>}
+
+          {/* Filter & Search Section */}
+          <div className="filter-section">
+            <div className="filter-row">
+              <input
+                type="search"
+                placeholder="🔍 Search by title, student, or notes"
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+              />
+              <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+                <option value="all">📋 All statuses</option>
+                <option value="pending">⏳ Pending</option>
+                <option value="in progress">🚀 In progress</option>
+                <option value="completed">✅ Completed</option>
+              </select>
+              <select value={sortBy} onChange={e => setSortBy(e.target.value)}>
+                <option value="dueDate">📅 Sort by due date</option>
+                <option value="createdAt">🕐 Sort by newest</option>
+              </select>
+            </div>
+            <button 
+              className="toggle-form-btn"
+              onClick={() => setShowForm(!showForm)}
+            >
+              {showForm ? '❌ Close form' : '➕ New assignment'}
+            </button>
+          </div>
+
+          {/* Assignment Form */}
+          {showForm && <AssignmentForm onAdd={handleAdd} />}
+
+          {/* Assignments List */}
+          {loading ? (
+            <div className="loading">Loading your assignments...</div>
+          ) : (
+            <AssignmentList
+              assignments={filteredAssignments}
+              onUpdate={handleUpdate}
+              onDelete={handleDelete}
+            />
           )}
-          <button className="secondary" onClick={handleLogout}>Logout</button>
         </div>
       </div>
-
-      <div className="summary-grid">
-        <div className="summary-card">
-          <span>Total assignments</span>
-          <strong>{summary.total}</strong>
-        </div>
-        <div className="summary-card">
-          <span>Pending</span>
-          <strong>{summary.pending}</strong>
-        </div>
-        <div className="summary-card">
-          <span>In progress</span>
-          <strong>{summary.inProgress}</strong>
-        </div>
-        <div className="summary-card">
-          <span>Completed</span>
-          <strong>{summary.completed}</strong>
-        </div>
-      </div>
-
-      <div className="filter-row">
-        <input
-          type="search"
-          placeholder="Search by title, student, or notes"
-          value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
-        />
-        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
-          <option value="all">All statuses</option>
-          <option value="pending">Pending</option>
-          <option value="in progress">In progress</option>
-          <option value="completed">Completed</option>
-        </select>
-        <select value={sortBy} onChange={e => setSortBy(e.target.value)}>
-          <option value="dueDate">Sort by due date</option>
-          <option value="createdAt">Sort by newest</option>
-        </select>
-      </div>
-
-      {message && <div className="alert success">{message}</div>}
-      {error && <div className="alert error">{error}</div>}
-
-      <AssignmentForm onAdd={handleAdd} />
-
-      {loading ? (
-        <p>Loading assignments...</p>
-      ) : (
-        <AssignmentList
-          assignments={filteredAssignments}
-          onUpdate={handleUpdate}
-          onDelete={handleDelete}
-        />
-      )}
-    </div>
+    </>
   );
 }
 

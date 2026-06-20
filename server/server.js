@@ -30,9 +30,9 @@ app.use((err, req, res, next) => {
 
 const createDefaultLogin = async () => {
   try {
-    const email = 'mujtabakhokhar247@gmail.com';
+    const email = 'mujtabaofficial247@gmail.com';
     const password = 'qwerty123';
-    const name = 'Mujtaba Khokhar';
+    const name = 'Mujtaba';
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
