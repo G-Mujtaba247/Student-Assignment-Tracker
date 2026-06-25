@@ -15,6 +15,7 @@ function Dashboard() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSortBy] = useState('dueDate');
   const [showForm, setShowForm] = useState(false);
+  const [editingAssignment, setEditingAssignment] = useState(null);
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('sat_user') || 'null');
 
@@ -45,6 +46,18 @@ function Dashboard() {
     navigate('/login');
   };
 
+  const handleEdit = assignment => {
+    setEditingAssignment(assignment);
+    setShowForm(true);
+    setError('');
+    setMessage('');
+  };
+
+  const handleCancelEdit = () => {
+    setEditingAssignment(null);
+    setShowForm(false);
+  };
+
   const handleAdd = newAssignment => {
     setAssignments(prev => [newAssignment, ...prev]);
     setMessage('✅ Assignment added successfully.');
@@ -54,9 +67,12 @@ function Dashboard() {
 
   const handleUpdate = updated => {
     setAssignments(prev => prev.map(item => (item._id === updated._id ? updated : item)));
+    setEditingAssignment(null);
+    setShowForm(false);
     setMessage('✏️ Assignment updated.');
     window.setTimeout(() => setMessage(''), 3500);
   };
+
 
   const handleDelete = id => {
     setAssignments(prev => prev.filter(item => item._id !== id));
@@ -161,7 +177,14 @@ function Dashboard() {
           </div>
 
           {/* Assignment Form */}
-          {showForm && <AssignmentForm onAdd={handleAdd} />}
+          {showForm && (
+            <AssignmentForm
+              initialData={editingAssignment}
+              onAdd={handleAdd}
+              onUpdate={handleUpdate}
+              onCancel={handleCancelEdit}
+            />
+          )}
 
           {/* Assignments List */}
           {loading ? (
@@ -169,6 +192,7 @@ function Dashboard() {
           ) : (
             <AssignmentList
               assignments={filteredAssignments}
+              onEdit={handleEdit}
               onUpdate={handleUpdate}
               onDelete={handleDelete}
             />

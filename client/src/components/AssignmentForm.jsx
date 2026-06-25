@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import api from '../api.js';
 import './AssignmentForm.css';
 
-function AssignmentForm({ onAdd }) {
+function AssignmentForm({ initialData = null, onAdd, onUpdate, onCancel }) {
   const [title, setTitle] = useState('');
   const [studentName, setStudentName] = useState('');
   const [description, setDescription] = useState('');
@@ -10,6 +10,23 @@ function AssignmentForm({ onAdd }) {
   const [status, setStatus] = useState('pending');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const isEditing = Boolean(initialData?._id);
+
+  useEffect(() => {
+    if (initialData) {
+      setTitle(initialData.title || '');
+      setStudentName(initialData.studentName || '');
+      setDescription(initialData.description || '');
+      setDueDate(initialData.dueDate ? initialData.dueDate.split('T')[0] : '');
+      setStatus(initialData.status || 'pending');
+    } else {
+      setTitle('');
+      setStudentName('');
+      setDescription('');
+      setDueDate('');
+      setStatus('pending');
+    }
+  }, [initialData]);
 
   const handleSubmit = async event => {
     event.preventDefault();
@@ -17,21 +34,32 @@ function AssignmentForm({ onAdd }) {
     setLoading(true);
 
     try {
-      const response = await api.post('/assignments', {
+      const payload = {
         title,
         studentName,
         description,
         dueDate,
         status,
-      });
-      onAdd(response.data);
-      setTitle('');
-      setStudentName('');
-      setDescription('');
-      setDueDate('');
-      setStatus('pending');
+      };
+
+      let response;
+      if (initialData?._id) {
+        response = await api.put(`/assignments/${initialData._id}`, payload);
+        onUpdate(response.data);
+      } else {
+        response = await api.post('/assignments', payload);
+        onAdd(response.data);
+      }
+
+      if (!initialData) {
+        setTitle('');
+        setStudentName('');
+        setDescription('');
+        setDueDate('');
+        setStatus('pending');
+      }
     } catch (err) {
-      setError(err.response?.data?.message || 'Unable to create assignment.');
+      setError(err.response?.data?.message || 'Unable to save assignment.');
     } finally {
       setLoading(false);
     }
@@ -40,8 +68,10 @@ function AssignmentForm({ onAdd }) {
   return (
     <div className="form-container">
       <div className="form-header">
-        <h2>📝 Create New Assignment</h2>
-        <p className="form-subtitle">Add a new task and assign it to a student</p>
+        <h2>{isEditing ? '✏️ Update Assignment' : '📝 Create New Assignment'}</h2>
+        <p className="form-subtitle">
+          {isEditing ? 'Edit the assignment details and save your changes.' : 'Add a new task and assign it to a student.'}
+        </p>
       </div>
 
       {error && <div className="alert error"><span>✕</span> {error}</div>}
@@ -105,14 +135,19 @@ function AssignmentForm({ onAdd }) {
             {loading ? (
               <>
                 <span className="loading-spinner"></span>
-                Creating...
+                {isEditing ? 'Saving...' : 'Creating...'}
               </>
             ) : (
               <>
-                <span>➕</span> Create Assignment
+                <span>{isEditing ? '✏️' : '➕'}</span> {isEditing ? 'Update Assignment' : 'Create Assignment'}
               </>
             )}
           </button>
+          {isEditing && onCancel && (
+            <button type="button" className="form-secondary" onClick={onCancel}>
+              Cancel
+            </button>
+          )}
         </div>
       </form>
     </div>

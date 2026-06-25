@@ -1,7 +1,7 @@
 import api from '../api.js';
 import './AssignmentList.css';
 
-function AssignmentList({ assignments, onUpdate, onDelete }) {
+function AssignmentList({ assignments, onEdit, onUpdate, onDelete }) {
   const statusOptions = [
     { value: 'pending', label: '⏳ Pending', icon: '⏳' },
     { value: 'in progress', label: '🚀 In Progress', icon: '🚀' },
@@ -71,6 +71,13 @@ function AssignmentList({ assignments, onUpdate, onDelete }) {
                 {status.icon}
               </button>
             ))}
+            <button
+              onClick={() => onEdit(item)}
+              className="secondary"
+              title="Edit assignment"
+            >
+              ✏️
+            </button>
             <button 
               onClick={() => removeAssignment(item._id)} 
               className="danger"
