@@ -1,9 +1,33 @@
 .page-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 32px 24px;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #5b6be5 0%, #8251d2 38%, #cf5bf4 100%);
+  padding: 36px 24px;
   margin: -28px -24px 32px -24px;
-  border-radius: 0 0 28px 28px;
-  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
+  border-radius: 0 0 32px 32px;
+  box-shadow: 0 16px 40px rgba(79, 70, 229, 0.22);
+}
+
+.page-header::before {
+  content: '';
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  top: -60px;
+  right: -60px;
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 50%;
+}
+
+.page-header::after {
+  content: '';
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  bottom: -100px;
+  left: -100px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
 }
 
 .header-content {
@@ -58,9 +82,10 @@
 }
 
 .nav-btn.secondary {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.18);
   color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(10px);
 }
 
 .nav-btn.secondary:hover {

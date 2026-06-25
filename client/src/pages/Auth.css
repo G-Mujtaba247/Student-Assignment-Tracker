@@ -1,19 +1,46 @@
 .auth-page {
+  position: relative;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: var(--spacing-lg);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 20%, #f093fb 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 100%);
+  overflow: hidden;
+}
+
+.auth-page::before {
+  content: '';
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  top: -80px;
+  right: -80px;
+}
+
+.auth-page::after {
+  content: '';
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  bottom: -90px;
+  left: -70px;
 }
 
 .auth-container {
+  position: relative;
+  z-index: 1;
   width: 100%;
-  max-width: 420px;
-  background: var(--surface);
+  max-width: 460px;
+  background: rgba(255, 255, 255, 0.94);
   border-radius: var(--radius-xl);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-  padding: var(--spacing-xl);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 40px 90px rgba(15, 23, 42, 0.16);
+  padding: calc(var(--spacing-xl) + 8px);
   animation: fadeInUp 0.5s ease;
 }
 
@@ -23,9 +50,17 @@
 }
 
 .auth-logo {
-  font-size: 3.5rem;
-  display: block;
-  margin-bottom: var(--spacing-md);
+  width: 72px;
+  height: 72px;
+  margin: 0 auto var(--spacing-md) auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  font-size: 2rem;
+  box-shadow: 0 18px 40px rgba(102, 126, 234, 0.22);
 }
 
 .auth-header h1 {
