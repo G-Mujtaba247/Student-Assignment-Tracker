@@ -22,6 +22,19 @@ const assignmentSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+  studentWork: {
+    type: String,
+    trim: true,
+    default: '',
+  },
+  submitted: {
+    type: Boolean,
+    default: false,
+  },
+  submittedAt: {
+    type: Date,
+    default: null,
+  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
