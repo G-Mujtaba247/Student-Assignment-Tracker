@@ -28,8 +28,11 @@ export const createAssignment = async (req, res, next) => {
       description,
       dueDate,
       studentName,
-      status,
+      status: status || 'pending',
       createdBy: req.user.id,
+      isSubmitted: false,
+      submittedAt: null,
+      startedAt: status === 'in progress' ? new Date() : null,
     });
 
     res.status(201).json(assignment);

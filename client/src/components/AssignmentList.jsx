@@ -2,19 +2,26 @@ import api from '../api.js';
 import './AssignmentList.css';
 
 function AssignmentList({ assignments, onEdit, onUpdate, onDelete }) {
-  const statusOptions = [
-    { value: 'pending', label: '⏳ Pending', icon: '⏳' },
-    { value: 'in progress', label: '🚀 In Progress', icon: '🚀' },
-    { value: 'completed', label: '✅ Completed', icon: '✅' },
-  ];
-
-  const updateStatus = async (assignment, status) => {
-    if (assignment.status === status) return;
+  const startWorking = async assignment => {
+    if (assignment.isSubmitted) return;
     try {
-      const response = await api.put(`/assignments/${assignment._id}`, { status });
+      const response = await api.put(`/assignments/${assignment._id}`, { status: 'in progress' });
       onUpdate(response.data);
     } catch (err) {
-      console.error('Error updating status:', err);
+      console.error('Error starting assignment:', err);
+    }
+  };
+
+  const submitAssignment = async assignment => {
+    if (assignment.isSubmitted) return;
+    try {
+      const response = await api.put(`/assignments/${assignment._id}`, {
+        status: 'completed',
+        isSubmitted: true,
+      });
+      onUpdate(response.data);
+    } catch (err) {
+      console.error('Error submitting assignment:', err);
     }
   };
 
@@ -48,8 +55,8 @@ function AssignmentList({ assignments, onEdit, onUpdate, onDelete }) {
               <h3>{item.title}</h3>
               <p className="meta">👤 {item.studentName || 'Unassigned'}</p>
             </div>
-            <span className={`status-chip status-${item.status.replace(' ', '-')}`}>
-              {statusOptions.find(s => s.value === item.status)?.label}
+            <span className={`status-chip status-${item.isSubmitted ? 'completed' : item.status.replace(' ', '-')}`}>
+              {item.isSubmitted ? '✅ Submitted' : item.status === 'pending' ? '⏳ Pending' : item.status === 'in progress' ? '🚀 In Progress' : '✅ Completed'}
             </span>
           </div>
 
@@ -60,31 +67,39 @@ function AssignmentList({ assignments, onEdit, onUpdate, onDelete }) {
           </div>
 
           <div className="action-row">
-            {statusOptions.map(status => (
-              <button
-                key={status.value}
-                onClick={() => updateStatus(item, status.value)}
-                className={item.status === status.value ? 'secondary active' : 'secondary'}
-                disabled={item.status === status.value}
-                title={`Mark as ${status.label}`}
-              >
-                {status.icon}
+            {!item.isSubmitted && item.status === 'pending' && (
+              <button onClick={() => startWorking(item)} className="secondary" title="Start working on this assignment">
+                🚀 Start
               </button>
-            ))}
-            <button
-              onClick={() => onEdit(item)}
-              className="secondary"
-              title="Edit assignment"
-            >
-              ✏️
-            </button>
-            <button 
-              onClick={() => removeAssignment(item._id)} 
-              className="danger"
-              title="Delete assignment"
-            >
-              🗑️
-            </button>
+            )}
+            {!item.isSubmitted && item.status !== 'pending' && (
+              <button onClick={() => submitAssignment(item)} className="secondary active" title="Submit this assignment">
+                ✅ Submit
+              </button>
+            )}
+            {!item.isSubmitted && (
+              <>
+                <button
+                  onClick={() => onEdit(item)}
+                  className="secondary"
+                  title="Edit assignment"
+                >
+                  ✏️ Edit
+                </button>
+                <button 
+                  onClick={() => removeAssignment(item._id)} 
+                  className="danger"
+                  title="Delete assignment"
+                >
+                  🗑️ Delete
+                </button>
+              </>
+            )}
+            {item.isSubmitted && (
+              <div className="meta" style={{ gridColumn: '1 / -1', textAlign: 'center' }}>
+                Read-only • submitted for review
+              </div>
+            )}
           </div>
         </div>
       ))}
