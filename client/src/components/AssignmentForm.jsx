@@ -2,14 +2,16 @@ import { useEffect, useState } from 'react';
 import api from '../api.js';
 import './AssignmentForm.css';
 
+const MAX_DESC = 500;
+
 function AssignmentForm({ initialData = null, onAdd, onUpdate, onCancel }) {
-  const [title, setTitle] = useState('');
-  const [studentName, setStudentName] = useState('');
-  const [description, setDescription] = useState('');
-  const [dueDate, setDueDate] = useState('');
-  const [status, setStatus] = useState('pending');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [title, setTitle]               = useState('');
+  const [studentName, setStudentName]   = useState('');
+  const [description, setDescription]   = useState('');
+  const [dueDate, setDueDate]           = useState('');
+  const [status, setStatus]             = useState('pending');
+  const [error, setError]               = useState('');
+  const [loading, setLoading]           = useState(false);
   const isEditing = Boolean(initialData?._id);
 
   useEffect(() => {
@@ -32,16 +34,8 @@ function AssignmentForm({ initialData = null, onAdd, onUpdate, onCancel }) {
     event.preventDefault();
     setError('');
     setLoading(true);
-
     try {
-      const payload = {
-        title,
-        studentName,
-        description,
-        dueDate,
-        status,
-      };
-
+      const payload = { title, studentName, description, dueDate, status };
       let response;
       if (initialData?._id) {
         response = await api.put(`/assignments/${initialData._id}`, payload);
@@ -49,9 +43,6 @@ function AssignmentForm({ initialData = null, onAdd, onUpdate, onCancel }) {
       } else {
         response = await api.post('/assignments', payload);
         onAdd(response.data);
-      }
-
-      if (!initialData) {
         setTitle('');
         setStudentName('');
         setDescription('');
@@ -65,22 +56,43 @@ function AssignmentForm({ initialData = null, onAdd, onUpdate, onCancel }) {
     }
   };
 
+  const descCharsLeft = MAX_DESC - description.length;
+  const descOverLimit = descCharsLeft < 0;
+
   return (
     <div className="form-container">
+      {/* Header */}
       <div className="form-header">
-        <h2>{isEditing ? '✏️ Update Assignment' : '📝 Create New Assignment'}</h2>
-        <p className="form-subtitle">
-          {isEditing ? 'Edit the assignment details and save your changes.' : 'Add a new task and assign it to a student.'}
-        </p>
+        <div className="form-header-left">
+          <h2>{isEditing ? '✏️ Update Assignment' : '📝 New Assignment'}</h2>
+          <p className="form-subtitle">
+            {isEditing
+              ? 'Edit the details below and save your changes.'
+              : 'Fill in the details to create a new assignment.'}
+          </p>
+        </div>
+        {onCancel && (
+          <button
+            type="button"
+            className="form-close-btn"
+            onClick={onCancel}
+            title="Close form"
+            aria-label="Close form"
+            id="form-close-btn"
+          >
+            ✕
+          </button>
+        )}
       </div>
 
-      {error && <div className="alert error"><span>✕</span> {error}</div>}
+      {error && <div className="alert error" role="alert"><span>✕</span> {error}</div>}
 
-      <form onSubmit={handleSubmit} className="form-grid">
+      <form onSubmit={handleSubmit} className="form-grid" noValidate>
+        {/* Title */}
         <div className="form-group">
-          <label htmlFor="title">Assignment Title *</label>
+          <label htmlFor="af-title" className="form-label">Assignment Title <span className="required-star">*</span></label>
           <input
-            id="title"
+            id="af-title"
             type="text"
             placeholder="e.g., Math Assignment #5"
             value={title}
@@ -89,10 +101,11 @@ function AssignmentForm({ initialData = null, onAdd, onUpdate, onCancel }) {
           />
         </div>
 
+        {/* Student Name */}
         <div className="form-group">
-          <label htmlFor="student">Student Name</label>
+          <label htmlFor="af-student" className="form-label">Student Name</label>
           <input
-            id="student"
+            id="af-student"
             type="text"
             placeholder="e.g., John Doe"
             value={studentName}
@@ -100,51 +113,64 @@ function AssignmentForm({ initialData = null, onAdd, onUpdate, onCancel }) {
           />
         </div>
 
+        {/* Due Date */}
         <div className="form-group">
-          <label htmlFor="dueDate">Due Date</label>
+          <label htmlFor="af-due" className="form-label">Due Date</label>
           <input
-            id="dueDate"
+            id="af-due"
             type="date"
             value={dueDate}
             onChange={e => setDueDate(e.target.value)}
           />
         </div>
 
+        {/* Status */}
         <div className="form-group">
-          <label htmlFor="status">Status</label>
-          <select id="status" value={status} onChange={e => setStatus(e.target.value)}>
+          <label htmlFor="af-status" className="form-label">Status</label>
+          <select id="af-status" value={status} onChange={e => setStatus(e.target.value)}>
             <option value="pending">⏳ Pending</option>
             <option value="in progress">🚀 In Progress</option>
             <option value="completed">✅ Completed</option>
           </select>
         </div>
 
+        {/* Description — full width */}
         <div className="form-group-full">
-          <label htmlFor="description">Description</label>
+          <label htmlFor="af-desc" className="form-label">Description</label>
           <textarea
-            id="description"
-            placeholder="Add details about this assignment..."
+            id="af-desc"
+            placeholder="Add details, instructions, or notes about this assignment…"
             value={description}
-            onChange={e => setDescription(e.target.value)}
+            onChange={e => setDescription(e.target.value.slice(0, MAX_DESC))}
             rows="4"
           />
+          <span className={`char-counter ${descOverLimit ? 'over-limit' : descCharsLeft < 50 ? 'near-limit' : ''}`}>
+            {description.length}/{MAX_DESC}
+          </span>
         </div>
 
+        {/* Actions */}
         <div className="form-actions">
-          <button type="submit" disabled={loading} className="form-submit">
+          <button type="submit" disabled={loading} className="form-submit" id="form-submit-btn">
             {loading ? (
               <>
-                <span className="loading-spinner"></span>
-                {isEditing ? 'Saving...' : 'Creating...'}
+                <span className="loading-spinner" />
+                {isEditing ? 'Saving…' : 'Creating…'}
               </>
             ) : (
               <>
-                <span>{isEditing ? '✏️' : '➕'}</span> {isEditing ? 'Update Assignment' : 'Create Assignment'}
+                <span>{isEditing ? '✏️' : '➕'}</span>
+                {isEditing ? 'Update Assignment' : 'Create Assignment'}
               </>
             )}
           </button>
-          {isEditing && onCancel && (
-            <button type="button" className="form-secondary" onClick={onCancel}>
+          {onCancel && (
+            <button
+              type="button"
+              className="form-secondary secondary"
+              onClick={onCancel}
+              id="form-cancel-btn"
+            >
               Cancel
             </button>
           )}

@@ -8,15 +8,13 @@ import AdminRoute from './components/AdminRoute.jsx';
 
 function App() {
   return (
-    <div className="app-shell">
-      <Routes>
-        <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-        <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="*" element={<Navigate replace to="/" />} />
-      </Routes>
-    </div>
+    <Routes>
+      <Route path="/"        element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      <Route path="/admin"   element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+      <Route path="/login"   element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="*"        element={<Navigate replace to="/" />} />
+    </Routes>
   );
 }
 
