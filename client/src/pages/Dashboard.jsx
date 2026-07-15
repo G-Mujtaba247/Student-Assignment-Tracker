@@ -4,6 +4,9 @@ import api from '../api.js';
 import Header from '../components/Header.jsx';
 import AssignmentForm from '../components/AssignmentForm.jsx';
 import AssignmentList from '../components/AssignmentList.jsx';
+import KanbanBoard from '../components/KanbanBoard.jsx';
+import toast, { Toaster } from 'react-hot-toast';
+import { motion, AnimatePresence } from 'framer-motion';
 import './Dashboard.css';
 
 /* Animated count-up hook */
@@ -63,14 +66,17 @@ function Dashboard() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSortBy]           = useState('dueDate');
   const [showForm, setShowForm]       = useState(false);
+  const [viewMode, setViewMode]       = useState('list'); // 'list' or 'board'
   const [editingAssignment, setEditingAssignment] = useState(null);
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('sat_user') || 'null');
 
   const showMessage = useCallback((msg, isError = false) => {
-    if (isError) { setError(msg); setMessage(''); }
-    else         { setMessage(msg); setError(''); }
-    window.setTimeout(() => { setMessage(''); setError(''); }, 3500);
+    if (isError) { 
+      toast.error(msg, { position: 'bottom-center' });
+    } else { 
+      toast.success(msg, { position: 'bottom-center' });
+    }
   }, []);
 
   const fetchAssignments = useCallback(async () => {
@@ -124,7 +130,17 @@ function Dashboard() {
 
   const handleDelete = id => {
     setAssignments(prev => prev.filter(item => item._id !== id));
-    showMessage('🗑️ Assignment removed.');
+    showMessage('Assignment removed.');
+  };
+
+  const handleStatusChange = async (assignment, newStatus) => {
+    try {
+      const response = await api.put(`/assignments/${assignment._id}`, { status: newStatus });
+      setAssignments(prev => prev.map(item => (item._id === response.data._id ? response.data : item)));
+      showMessage('Status updated.');
+    } catch (err) {
+      showMessage('Failed to update status', true);
+    }
   };
 
   const filteredAssignments = useMemo(() => {
@@ -159,6 +175,7 @@ function Dashboard() {
 
   return (
     <>
+      <Toaster />
       <Header
         title="Assignment Tracker"
         subtitle="Stay on top of your work — create, track and submit with ease."
@@ -178,10 +195,6 @@ function Dashboard() {
               <SummaryCard label="In Progress" value={summary.inProgress} icon="🚀" variant="progress" />
               <SummaryCard label="Completed"   value={summary.completed}  icon="✅" variant="done"     />
             </div>
-
-            {/* ── Alerts ── */}
-            {message && <div className="alert success" role="status"><span>✓</span> {message}</div>}
-            {error   && <div className="alert error"   role="alert" ><span>✕</span> {error}</div>}
 
             {/* ── Filter & Search ── */}
             <div className="filter-section">
@@ -219,18 +232,27 @@ function Dashboard() {
                 </select>
               </div>
 
-              <button
-                className={`toggle-form-btn ${showForm ? 'is-open' : ''}`}
-                onClick={() => showForm ? handleCloseForm() : setShowForm(true)}
-                id="toggle-form-btn"
-                aria-expanded={showForm}
-              >
-                {showForm ? (
-                  <><span>✕</span> Close form</>
-                ) : (
-                  <><span>＋</span> New assignment</>
-                )}
-              </button>
+              <div style={{display: 'flex', gap: '8px'}}>
+                <button
+                  className="secondary"
+                  onClick={() => setViewMode(prev => prev === 'list' ? 'board' : 'list')}
+                  title="Toggle View Mode"
+                >
+                  {viewMode === 'list' ? '📋 Board View' : '📄 List View'}
+                </button>
+                <button
+                  className={`toggle-form-btn ${showForm ? 'is-open' : ''}`}
+                  onClick={() => showForm ? handleCloseForm() : setShowForm(true)}
+                  id="toggle-form-btn"
+                  aria-expanded={showForm}
+                >
+                  {showForm ? (
+                    <><span>✕</span> Close form</>
+                  ) : (
+                    <><span>＋</span> New assignment</>
+                  )}
+                </button>
+              </div>
             </div>
 
             {/* ── Assignment Form ── */}
@@ -254,12 +276,19 @@ function Dashboard() {
             {/* ── Assignments ── */}
             {loading ? (
               <SkeletonGrid />
-            ) : (
+            ) : viewMode === 'list' ? (
               <AssignmentList
                 assignments={filteredAssignments}
                 onEdit={handleEdit}
                 onUpdate={handleUpdate}
                 onDelete={handleDelete}
+              />
+            ) : (
+              <KanbanBoard 
+                assignments={filteredAssignments}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onStatusChange={handleStatusChange}
               />
             )}
 

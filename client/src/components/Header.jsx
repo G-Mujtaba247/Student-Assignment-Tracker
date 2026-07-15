@@ -1,13 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Header.css';
 
 export default function Header({ title, subtitle, user, showAdminLink, onLogout }) {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [theme, setTheme] = useState(localStorage.getItem('sat_theme') || 'light');
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('sat_theme', theme);
+  }, [theme]);
 
   const toggleMenu = () => setMenuOpen(prev => !prev);
   const closeMenu  = () => setMenuOpen(false);
+  const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
 
   return (
     <header className="page-header">
@@ -27,6 +34,14 @@ export default function Header({ title, subtitle, user, showAdminLink, onLogout 
 
         {/* Desktop Nav */}
         <nav className="header-nav desktop-nav" aria-label="Main navigation">
+          <button 
+            className="nav-btn secondary theme-toggle-btn"
+            onClick={toggleTheme}
+            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+          >
+            <span className="nav-icon">{theme === 'light' ? '🌙' : '☀️'}</span>
+          </button>
+
           {showAdminLink && user?.role === 'admin' && (
             <button
               className="nav-btn secondary"
@@ -56,17 +71,28 @@ export default function Header({ title, subtitle, user, showAdminLink, onLogout 
         </nav>
 
         {/* Hamburger — mobile only */}
-        <button
-          className={`hamburger ${menuOpen ? 'is-open' : ''}`}
-          onClick={toggleMenu}
-          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-          aria-expanded={menuOpen}
-          id="nav-hamburger-btn"
-        >
-          <span />
-          <span />
-          <span />
-        </button>
+        <div className="mobile-actions" style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
+          <button 
+            className="nav-btn secondary theme-toggle-btn mobile-theme-btn"
+            onClick={toggleTheme}
+            style={{padding: '8px 12px', border: 'none', background: 'transparent', boxShadow: 'none'}}
+            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+          >
+            <span className="nav-icon" style={{fontSize: '1.2rem'}}>{theme === 'light' ? '🌙' : '☀️'}</span>
+          </button>
+
+          <button
+            className={`hamburger ${menuOpen ? 'is-open' : ''}`}
+            onClick={toggleMenu}
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+            id="nav-hamburger-btn"
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+        </div>
       </div>
 
       {/* Mobile Drawer */}

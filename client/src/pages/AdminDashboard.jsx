@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api.js';
 import Header from '../components/Header.jsx';
+import Header from '../components/Header.jsx';
+import toast, { Toaster } from 'react-hot-toast';
 import './AdminDashboard.css';
 
 function formatDate(dateStr) {
@@ -52,9 +54,11 @@ function AdminDashboard() {
   const user = JSON.parse(localStorage.getItem('sat_user') || 'null');
 
   const showMessage = useCallback((msg, isError = false) => {
-    if (isError) { setError(msg); setMessage(''); }
-    else         { setMessage(msg); setError(''); }
-    window.setTimeout(() => { setMessage(''); setError(''); }, 3500);
+    if (isError) { 
+      toast.error(msg, { position: 'bottom-center' });
+    } else { 
+      toast.success(msg, { position: 'bottom-center' });
+    }
   }, []);
 
   const fetchAdminData = useCallback(async () => {
@@ -143,6 +147,8 @@ function AdminDashboard() {
         onLogout={handleLogout}
       />
 
+      <Toaster />
+
       <div className="app-shell">
         <div className="page-wrapper">
           <div className="page-card">
@@ -154,10 +160,6 @@ function AdminDashboard() {
               <StatCard label="Pending"     value={stats.pending}     icon="⏳" variant="pending"  />
               <StatCard label="Completed"   value={stats.completed}   icon="✅" variant="done"     />
             </div>
-
-            {/* ── Alerts ── */}
-            {message && <div className="alert success" role="status"><span>✓</span> {message}</div>}
-            {error   && <div className="alert error"   role="alert" ><span>✕</span> {error}</div>}
 
             {/* ── Tabs ── */}
             <div className="admin-tabs" role="tablist">

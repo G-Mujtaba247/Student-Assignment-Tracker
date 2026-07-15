@@ -1,4 +1,6 @@
 import api from '../api.js';
+import api from '../api.js';
+import { motion, AnimatePresence } from 'framer-motion';
 import './AssignmentList.css';
 
 /* ── Helpers ── */
@@ -76,18 +78,23 @@ function AssignmentList({ assignments, onEdit, onUpdate, onDelete }) {
   }
 
   return (
-    <div className="assignment-grid" role="list">
+    <motion.div className="assignment-grid" role="list" layout>
+      <AnimatePresence>
       {assignments.map((item, index) => {
         const overdue = isOverdue(item);
         const { cls, label } = getStatusChip(item);
         const stripCls = getStrip(item);
 
         return (
-          <article
+          <motion.article
             key={item._id}
             className="assignment-card"
             role="listitem"
-            style={{ animationDelay: `${index * 0.05}s` }}
+            layout
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.2, delay: index * 0.03 }}
           >
             {/* Colored top strip */}
             <div className={`assignment-card__strip ${stripCls}`} aria-hidden="true" />
@@ -172,10 +179,11 @@ function AssignmentList({ assignments, onEdit, onUpdate, onDelete }) {
                 </>
               )}
             </div>
-          </article>
+          </motion.article>
         );
       })}
-    </div>
+      </AnimatePresence>
+    </motion.div>
   );
 }
 
