@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api.js';
+import { motion } from 'framer-motion';
 import './Auth.css';
 
 function Login() {
@@ -28,7 +29,13 @@ function Login() {
   };
 
   return (
-    <div className="auth-page">
+    <motion.div 
+      className="auth-page"
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.98 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+    >
       {/* Floating decorative shapes */}
       <span className="auth-shape auth-shape--1" aria-hidden="true" />
       <span className="auth-shape auth-shape--2" aria-hidden="true" />
@@ -109,7 +116,7 @@ function Login() {
           </p>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 

@@ -1,22 +1,36 @@
 /* ============================================================
    ASSIGNMENT FORM — slide-down, grid, char counter
    ============================================================ */
+.form-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-md);
+  overflow-y: auto;
+}
 
 .form-container {
-  background: linear-gradient(135deg,
+  background: var(--surface);
     hsla(231,76%,66%,0.05) 0%,
-    hsla(279,38%,55%,0.05) 100%);
-  border: 1.5px solid var(--border-strong);
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius-xl);
   padding: var(--spacing-xl);
-  margin-bottom: var(--spacing-xl);
-  animation: formSlideDown 0.35s cubic-bezier(0.34, 1.1, 0.64, 1);
+  width: 100%;
+  max-width: 600px;
+  box-shadow: var(--shadow-xl);
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
-@keyframes formSlideDown {
-  from { opacity: 0; transform: translateY(-16px) scaleY(0.96); }
-  to   { opacity: 1; transform: translateY(0)    scaleY(1); }
-}
 
 /* ── Form Header ── */
 .form-header {

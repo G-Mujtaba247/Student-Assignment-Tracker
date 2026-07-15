@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../api.js';
+import { motion } from 'framer-motion';
 import './AssignmentForm.css';
 
 const MAX_DESC = 500;
@@ -60,7 +61,15 @@ function AssignmentForm({ initialData = null, onAdd, onUpdate, onCancel }) {
   const descOverLimit = descCharsLeft < 0;
 
   return (
-    <div className="form-container">
+    <div className="form-overlay" onClick={onCancel}>
+      <motion.div 
+        className="form-container"
+        onClick={e => e.stopPropagation()}
+        initial={{ y: 50, opacity: 0, scale: 0.95 }}
+        animate={{ y: 0, opacity: 1, scale: 1 }}
+        exit={{ y: 20, opacity: 0, scale: 0.95 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+      >
       {/* Header */}
       <div className="form-header">
         <div className="form-header-left">
@@ -176,6 +185,7 @@ function AssignmentForm({ initialData = null, onAdd, onUpdate, onCancel }) {
           )}
         </div>
       </form>
+      </motion.div>
     </div>
   );
 }

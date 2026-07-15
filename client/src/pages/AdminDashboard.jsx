@@ -1,9 +1,7 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import api from '../api.js';
-import Header from '../components/Header.jsx';
 import Header from '../components/Header.jsx';
 import toast, { Toaster } from 'react-hot-toast';
+import { motion } from 'framer-motion';
 import './AdminDashboard.css';
 
 function formatDate(dateStr) {
@@ -149,7 +147,12 @@ function AdminDashboard() {
 
       <Toaster />
 
-      <div className="app-shell">
+      <motion.div 
+        className="app-shell"
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
         <div className="page-wrapper">
           <div className="page-card">
 
@@ -318,7 +321,7 @@ function AdminDashboard() {
             )}
           </div>
         </div>
-      </div>
+      </motion.div>
     </>
   );
 }

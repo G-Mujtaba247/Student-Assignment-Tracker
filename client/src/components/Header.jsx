@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import './Header.css';
 
 export default function Header({ title, subtitle, user, showAdminLink, onLogout }) {
@@ -96,10 +97,15 @@ export default function Header({ title, subtitle, user, showAdminLink, onLogout 
       </div>
 
       {/* Mobile Drawer */}
-      <nav
-        className={`mobile-drawer ${menuOpen ? 'is-open' : ''}`}
+      <AnimatePresence>
+      {menuOpen && (
+      <motion.nav
+        className="mobile-drawer is-open"
         aria-label="Mobile navigation"
-        aria-hidden={!menuOpen}
+        initial={{ x: '100%' }}
+        animate={{ x: 0 }}
+        exit={{ x: '100%' }}
+        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
       >
         {user && (
           <div className="mobile-user">
@@ -126,7 +132,9 @@ export default function Header({ title, subtitle, user, showAdminLink, onLogout 
         >
           <span>🚪</span> Logout
         </button>
-      </nav>
+      </motion.nav>
+      )}
+      </AnimatePresence>
     </header>
   );
 }

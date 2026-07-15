@@ -184,7 +184,12 @@ function Dashboard() {
         onLogout={handleLogout}
       />
 
-      <div className="app-shell">
+      <motion.div 
+        className="app-shell"
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
         <div className="page-wrapper">
           <div className="page-card">
 
@@ -256,6 +261,7 @@ function Dashboard() {
             </div>
 
             {/* ── Assignment Form ── */}
+            <AnimatePresence>
             {showForm && (
               <AssignmentForm
                 initialData={editingAssignment}
@@ -264,6 +270,7 @@ function Dashboard() {
                 onCancel={handleCloseForm}
               />
             )}
+            </AnimatePresence>
 
             {/* ── Result count ── */}
             {!loading && (
@@ -294,7 +301,7 @@ function Dashboard() {
 
           </div>
         </div>
-      </div>
+      </motion.div>
     </>
   );
 }
