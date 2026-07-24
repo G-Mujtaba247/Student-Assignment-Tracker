@@ -12,6 +12,13 @@ export const registerUser = async (req, res, next) => {
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'Name, email, and password are required.' });
     }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: 'Invalid email format.' });
+    }
+    if (password.length < 8) {
+      return res.status(400).json({ message: 'Password must be at least 8 characters long.' });
+    }
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -42,18 +49,18 @@ export const loginUser = async (req, res, next) => {
       return res.status(400).json({ message: 'Email and password are required.' });
     }
 
-    const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase() || 'admin@school.com';
-    const adminPassword = process.env.ADMIN_PASSWORD || 'admin1234';
-    const studentEmail = process.env.STUDENT_EMAIL?.toLowerCase() || 'student@test.com';
-    const studentPassword = process.env.STUDENT_PASSWORD || 'student1234';
+    const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase();
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    const studentEmail = process.env.STUDENT_EMAIL?.toLowerCase();
+    const studentPassword = process.env.STUDENT_PASSWORD;
 
-    if (email.toLowerCase() === adminEmail) {
+    if (adminEmail && adminPassword && email.toLowerCase() === adminEmail) {
       if (password !== adminPassword) {
         return res.status(401).json({ message: 'Invalid email or password.' });
       }
 
       const adminUser = {
-        id: 'admin',
+        id: '000000000000000000000001',
         name: 'Administrator',
         email: adminEmail,
         role: 'admin',
@@ -65,13 +72,13 @@ export const loginUser = async (req, res, next) => {
       });
     }
 
-    if (email.toLowerCase() === studentEmail) {
+    if (studentEmail && studentPassword && email.toLowerCase() === studentEmail) {
       if (password !== studentPassword) {
         return res.status(401).json({ message: 'Invalid email or password.' });
       }
 
       const demoStudent = {
-        id: 'student',
+        id: '000000000000000000000002',
         name: 'Demo Student',
         email: studentEmail,
         role: 'user',

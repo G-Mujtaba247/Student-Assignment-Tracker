@@ -13,10 +13,10 @@ const protect = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const adminEmail = (process.env.ADMIN_EMAIL || 'admin@school.com').toLowerCase();
-    const studentEmail = (process.env.STUDENT_EMAIL || 'student@test.com').toLowerCase();
+    const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase();
+    const studentEmail = process.env.STUDENT_EMAIL?.toLowerCase();
 
-    if (decoded.id === 'admin' && decoded.role === 'admin' && decoded.email?.toLowerCase() === adminEmail) {
+    if (adminEmail && decoded.id === '000000000000000000000001' && decoded.role === 'admin' && decoded.email?.toLowerCase() === adminEmail) {
       req.user = {
         id: decoded.id,
         name: decoded.name || 'Administrator',
@@ -26,7 +26,7 @@ const protect = async (req, res, next) => {
       return next();
     }
 
-    if (decoded.id === 'student' && decoded.role === 'user' && decoded.email?.toLowerCase() === studentEmail) {
+    if (studentEmail && decoded.id === '000000000000000000000002' && decoded.role === 'user' && decoded.email?.toLowerCase() === studentEmail) {
       req.user = {
         id: decoded.id,
         name: decoded.name || 'Demo Student',

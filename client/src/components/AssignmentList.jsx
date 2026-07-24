@@ -1,5 +1,4 @@
 import api from '../api.js';
-import api from '../api.js';
 import { motion, AnimatePresence } from 'framer-motion';
 import './AssignmentList.css';
 

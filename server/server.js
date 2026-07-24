@@ -12,7 +12,10 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  credentials: true,
+}));
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
@@ -28,36 +31,7 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ message: err.message || 'Server Error' });
 });
 
-const createDefaultLogin = async () => {
-  try {
-    const email = 'mujtabaofficial247@gmail.com';
-    const password = 'qwerty123';
-    const name = 'Mujtaba';
-
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      console.log(`✅ Default login user already exists: ${email}`);
-      return;
-    }
-
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    await User.create({
-      name,
-      email,
-      password: hashedPassword,
-      role: 'user',
-    });
-
-    console.log(`✅ Default login created: ${email}`);
-  } catch (error) {
-    console.error('❌ Could not create default login user:', error.message);
-  }
-};
-
-connectDB().then(async () => {
-  await createDefaultLogin();
+connectDB().then(() => {
   app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
   });
