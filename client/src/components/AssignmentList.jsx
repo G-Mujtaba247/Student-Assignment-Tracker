@@ -45,14 +45,21 @@ function AssignmentList({ assignments, onEdit, onUpdate, onDelete }) {
 
   const submitAssignment = async assignment => {
     if (assignment.submitted) return;
+    const studentWork = window.prompt('Please enter your work (e.g. a link to your code or notes):');
+    if (studentWork === null) return; // User cancelled
+    if (!studentWork.trim()) {
+      alert('Student work cannot be empty.');
+      return;
+    }
+
     try {
-      const response = await api.put(`/assignments/${assignment._id}`, {
-        status: 'completed',
-        submitted: true,
+      const response = await api.put(`/assignments/${assignment._id}/submit`, {
+        studentWork: studentWork.trim(),
       });
-      onUpdate(response.data);
+      onUpdate(response.data.assignment);
     } catch (err) {
       console.error('Error submitting assignment:', err);
+      alert(err.response?.data?.message || 'Error submitting assignment');
     }
   };
 
@@ -120,6 +127,13 @@ function AssignmentList({ assignments, onEdit, onUpdate, onDelete }) {
               {/* Description */}
               {item.description && (
                 <p className="description-text">{item.description}</p>
+              )}
+
+              {/* Student Work */}
+              {item.submitted && item.studentWork && (
+                <div className="student-work">
+                  <strong>Work:</strong> <a href={item.studentWork.startsWith('http') ? item.studentWork : '#'} target="_blank" rel="noopener noreferrer">{item.studentWork}</a>
+                </div>
               )}
 
               {/* Due date */}
