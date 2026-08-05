@@ -193,6 +193,17 @@ function Dashboard() {
         <div className="page-wrapper">
           <div className="page-card">
 
+            {/* ── Error banner ── */}
+            {error && (
+              <div className="alert error dashboard-error" role="alert">
+                <span>❌</span>
+                <span>{error}</span>
+                <button type="button" className="alert-retry-btn secondary" onClick={fetchAssignments}>
+                  Retry
+                </button>
+              </div>
+            )}
+
             {/* ── Summary Cards ── */}
             <div className="summary-grid">
               <SummaryCard label="Total"       value={summary.total}      icon="📊" variant="total"    />
@@ -237,11 +248,12 @@ function Dashboard() {
                 </select>
               </div>
 
-              <div style={{display: 'flex', gap: '8px'}}>
+              <div className="filter-actions">
                 <button
-                  className="secondary"
+                  className={`secondary view-toggle-btn ${viewMode === 'board' ? 'active' : ''}`}
                   onClick={() => setViewMode(prev => prev === 'list' ? 'board' : 'list')}
                   title="Toggle View Mode"
+                  aria-pressed={viewMode === 'board'}
                 >
                   {viewMode === 'list' ? '📋 Board View' : '📄 List View'}
                 </button>

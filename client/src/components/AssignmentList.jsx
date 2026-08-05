@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import api from '../api.js';
 import { motion, AnimatePresence } from 'framer-motion';
+import SubmitWorkModal from './SubmitWorkModal.jsx';
 import './AssignmentList.css';
 
 /* ── Helpers ── */
@@ -32,6 +34,7 @@ function formatDate(dateStr) {
 
 /* ── Main Component ── */
 function AssignmentList({ assignments, onEdit, onUpdate, onDelete }) {
+  const [submitTarget, setSubmitTarget] = useState(null);
 
   const startWorking = async assignment => {
     if (assignment.submitted) return;
@@ -43,24 +46,10 @@ function AssignmentList({ assignments, onEdit, onUpdate, onDelete }) {
     }
   };
 
-  const submitAssignment = async assignment => {
-    if (assignment.submitted) return;
-    const studentWork = window.prompt('Please enter your work (e.g. a link to your code or notes):');
-    if (studentWork === null) return; // User cancelled
-    if (!studentWork.trim()) {
-      alert('Student work cannot be empty.');
-      return;
-    }
-
-    try {
-      const response = await api.put(`/assignments/${assignment._id}/submit`, {
-        studentWork: studentWork.trim(),
-      });
-      onUpdate(response.data.assignment);
-    } catch (err) {
-      console.error('Error submitting assignment:', err);
-      alert(err.response?.data?.message || 'Error submitting assignment');
-    }
+  const handleSubmitWork = async studentWork => {
+    const response = await api.put(`/assignments/${submitTarget._id}/submit`, { studentWork });
+    onUpdate(response.data.assignment);
+    setSubmitTarget(null);
   };
 
   const removeAssignment = async id => {
@@ -84,6 +73,7 @@ function AssignmentList({ assignments, onEdit, onUpdate, onDelete }) {
   }
 
   return (
+    <>
     <motion.div className="assignment-grid" role="list" layout>
       <AnimatePresence>
       {assignments.map((item, index) => {
@@ -165,7 +155,7 @@ function AssignmentList({ assignments, onEdit, onUpdate, onDelete }) {
                   )}
                   {item.status !== 'pending' && (
                     <button
-                      onClick={() => submitAssignment(item)}
+                      onClick={() => setSubmitTarget(item)}
                       className="secondary active"
                       title="Submit this assignment"
                       id={`submit-btn-${item._id}`}
@@ -197,6 +187,17 @@ function AssignmentList({ assignments, onEdit, onUpdate, onDelete }) {
       })}
       </AnimatePresence>
     </motion.div>
+
+    <AnimatePresence>
+      {submitTarget && (
+        <SubmitWorkModal
+          assignment={submitTarget}
+          onSubmit={handleSubmitWork}
+          onCancel={() => setSubmitTarget(null)}
+        />
+      )}
+    </AnimatePresence>
+    </>
   );
 }
 

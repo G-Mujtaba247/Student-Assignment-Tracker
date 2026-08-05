@@ -18,8 +18,7 @@
 }
 
 .form-container {
-  background: var(--surface);
-    hsla(231,76%,66%,0.05) 0%,
+  background: linear-gradient(180deg, var(--surface) 0%, hsla(231, 76%, 66%, 0.04) 100%);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-xl);
   padding: var(--spacing-xl);

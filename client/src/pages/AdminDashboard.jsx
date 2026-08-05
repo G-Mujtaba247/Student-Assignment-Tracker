@@ -144,6 +144,7 @@ function AdminDashboard() {
         subtitle="Monitor users, assignments, and system activity across the platform."
         user={user}
         showAdminLink={false}
+        showBackLink={true}
         onLogout={handleLogout}
       />
 
@@ -157,6 +158,17 @@ function AdminDashboard() {
       >
         <div className="page-wrapper">
           <div className="page-card">
+
+            {/* ── Error banner ── */}
+            {error && (
+              <div className="alert error dashboard-error" role="alert">
+                <span>❌</span>
+                <span>{error}</span>
+                <button type="button" className="alert-retry-btn secondary" onClick={fetchAdminData}>
+                  Retry
+                </button>
+              </div>
+            )}
 
             {/* ── Stats ── */}
             <div className="summary-grid">
@@ -209,7 +221,7 @@ function AdminDashboard() {
                   <section className="admin-section" aria-labelledby="tab-users">
                     <div className="section-header">
                       <h2 className="section-title">👥 Manage Users</h2>
-                      <div className="search-wrap" style={{ maxWidth: 320, width: '100%' }}>
+                      <div className="search-wrap admin-search">
                         <span className="search-icon" aria-hidden="true">🔍</span>
                         <input
                           type="search"
@@ -258,7 +270,7 @@ function AdminDashboard() {
                   <section className="admin-section" aria-labelledby="tab-assignments">
                     <div className="section-header">
                       <h2 className="section-title">📋 All Assignments</h2>
-                      <div className="search-wrap" style={{ maxWidth: 320, width: '100%' }}>
+                      <div className="search-wrap admin-search">
                         <span className="search-icon" aria-hidden="true">🔍</span>
                         <input
                           type="search"

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import './Header.css';
 
-export default function Header({ title, subtitle, user, showAdminLink, onLogout }) {
+export default function Header({ title, subtitle, user, showAdminLink, showBackLink, onLogout }) {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem('sat_theme') || 'light');
@@ -13,18 +13,21 @@ export default function Header({ title, subtitle, user, showAdminLink, onLogout 
     localStorage.setItem('sat_theme', theme);
   }, [theme]);
 
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [menuOpen]);
+
   const toggleMenu = () => setMenuOpen(prev => !prev);
   const closeMenu  = () => setMenuOpen(false);
   const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
 
   return (
     <header className="page-header">
-      {/* Decorative blobs */}
       <span className="header-blob header-blob--1" aria-hidden="true" />
       <span className="header-blob header-blob--2" aria-hidden="true" />
 
       <div className="header-content">
-        {/* Brand / Title */}
         <div className="header-brand">
           <div className="header-logo" aria-hidden="true">🎓</div>
           <div className="header-text">
@@ -33,12 +36,24 @@ export default function Header({ title, subtitle, user, showAdminLink, onLogout 
           </div>
         </div>
 
-        {/* Desktop Nav */}
         <nav className="header-nav desktop-nav" aria-label="Main navigation">
-          <button 
+          {showBackLink && (
+            <button
+              className="nav-btn secondary"
+              onClick={() => navigate('/')}
+              title="Back to dashboard"
+              id="nav-back-btn"
+            >
+              <span className="nav-icon">←</span>
+              <span className="nav-label">Dashboard</span>
+            </button>
+          )}
+
+          <button
             className="nav-btn secondary theme-toggle-btn"
             onClick={toggleTheme}
             title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
           >
             <span className="nav-icon">{theme === 'light' ? '🌙' : '☀️'}</span>
           </button>
@@ -71,15 +86,14 @@ export default function Header({ title, subtitle, user, showAdminLink, onLogout 
           </button>
         </nav>
 
-        {/* Hamburger — mobile only */}
-        <div className="mobile-actions" style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
-          <button 
+        <div className="mobile-actions">
+          <button
             className="nav-btn secondary theme-toggle-btn mobile-theme-btn"
             onClick={toggleTheme}
-            style={{padding: '8px 12px', border: 'none', background: 'transparent', boxShadow: 'none'}}
             title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
           >
-            <span className="nav-icon" style={{fontSize: '1.2rem'}}>{theme === 'light' ? '🌙' : '☀️'}</span>
+            <span className="nav-icon">{theme === 'light' ? '🌙' : '☀️'}</span>
           </button>
 
           <button
@@ -96,44 +110,62 @@ export default function Header({ title, subtitle, user, showAdminLink, onLogout 
         </div>
       </div>
 
-      {/* Mobile Drawer */}
       <AnimatePresence>
-      {menuOpen && (
-      <motion.nav
-        className="mobile-drawer is-open"
-        aria-label="Mobile navigation"
-        initial={{ x: '100%' }}
-        animate={{ x: 0 }}
-        exit={{ x: '100%' }}
-        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-      >
-        {user && (
-          <div className="mobile-user">
-            <span className="user-avatar-chip user-avatar-chip--lg">{user.name.charAt(0).toUpperCase()}</span>
-            <div>
-              <p className="mobile-user__name">{user.name}</p>
-              <p className="mobile-user__role">{user.role === 'admin' ? '⚙️ Administrator' : '👤 Student'}</p>
-            </div>
-          </div>
+        {menuOpen && (
+          <>
+            <motion.div
+              className="mobile-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={closeMenu}
+              aria-hidden="true"
+            />
+            <motion.nav
+              className="mobile-drawer"
+              aria-label="Mobile navigation"
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ type: 'spring', damping: 28, stiffness: 320 }}
+            >
+              {user && (
+                <div className="mobile-user">
+                  <span className="user-avatar-chip user-avatar-chip--lg">{user.name.charAt(0).toUpperCase()}</span>
+                  <div>
+                    <p className="mobile-user__name">{user.name}</p>
+                    <p className="mobile-user__role">{user.role === 'admin' ? '⚙️ Administrator' : '👤 Student'}</p>
+                  </div>
+                </div>
+              )}
+              {showBackLink && (
+                <button
+                  className="mobile-nav-btn"
+                  onClick={() => { navigate('/'); closeMenu(); }}
+                  id="mobile-nav-back-btn"
+                >
+                  <span>←</span> Back to Dashboard
+                </button>
+              )}
+              {showAdminLink && user?.role === 'admin' && (
+                <button
+                  className="mobile-nav-btn"
+                  onClick={() => { navigate('/admin'); closeMenu(); }}
+                  id="mobile-nav-admin-btn"
+                >
+                  <span>⚙️</span> Admin Dashboard
+                </button>
+              )}
+              <button
+                className="mobile-nav-btn danger"
+                onClick={() => { onLogout(); closeMenu(); }}
+                id="mobile-nav-logout-btn"
+              >
+                <span>🚪</span> Logout
+              </button>
+            </motion.nav>
+          </>
         )}
-        {showAdminLink && user?.role === 'admin' && (
-          <button
-            className="mobile-nav-btn"
-            onClick={() => { navigate('/admin'); closeMenu(); }}
-            id="mobile-nav-admin-btn"
-          >
-            <span>⚙️</span> Admin Dashboard
-          </button>
-        )}
-        <button
-          className="mobile-nav-btn danger"
-          onClick={() => { onLogout(); closeMenu(); }}
-          id="mobile-nav-logout-btn"
-        >
-          <span>🚪</span> Logout
-        </button>
-      </motion.nav>
-      )}
       </AnimatePresence>
     </header>
   );

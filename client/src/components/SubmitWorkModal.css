@@ -1,0 +1,117 @@
+.submit-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-md);
+}
+
+.submit-modal {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xl);
+  width: 100%;
+  max-width: 480px;
+  box-shadow: var(--shadow-xl);
+}
+
+.submit-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.submit-modal-header h2 {
+  margin: 0 0 4px;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.submit-modal-subtitle {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+.submit-modal-close {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+  border: 1.5px solid var(--border-strong);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: none;
+}
+
+.submit-modal-close:hover:not(:disabled) {
+  background: var(--danger-light);
+  border-color: var(--danger);
+  color: var(--danger);
+  transform: none;
+  box-shadow: none;
+}
+
+.submit-modal textarea {
+  width: 100%;
+  padding: 12px var(--spacing-md);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 0.93rem;
+  background: var(--surface);
+  color: var(--text);
+  resize: vertical;
+  min-height: 110px;
+  outline: none;
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+.submit-modal textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px hsla(231, 76%, 66%, 0.12);
+}
+
+.submit-modal-hint {
+  margin: var(--spacing-sm) 0 var(--spacing-lg);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.submit-modal-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.submit-modal-primary {
+  flex: 1;
+  min-width: 140px;
+}
+
+@media (max-width: 480px) {
+  .submit-modal {
+    padding: var(--spacing-lg);
+  }
+  .submit-modal-actions {
+    flex-direction: column;
+  }
+  .submit-modal-actions button {
+    width: 100%;
+  }
+}
