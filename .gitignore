@@ -1,7 +1,15 @@
+.env
+.env.*
+!.env.example
+!server/.env.example
+!client/.env.example
+server/.env
+server/.env.*
+client/.env
+client/.env.*
 node_modules/
 dist/
 build/
-.env
 client/node_modules/
 server/node_modules/
 .DS_Store
