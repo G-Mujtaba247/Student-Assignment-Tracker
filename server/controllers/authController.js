@@ -28,9 +28,7 @@ export const registerUser = async (req, res, next) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-        const role = process.env.ADMIN_EMAIL && email.toLowerCase() === process.env.ADMIN_EMAIL.toLowerCase()
-      ? 'admin'
-      : 'user';
+    const role = 'user';
 
     const user = await User.create({ name, email, password: hashedPassword, role });
     res.status(201).json({
@@ -47,47 +45,6 @@ export const loginUser = async (req, res, next) => {
     const { email, password } = req.body;
     if (!email || !password) {
       return res.status(400).json({ message: 'Email and password are required.' });
-    }
-
-    const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase();
-    const adminPassword = process.env.ADMIN_PASSWORD;
-    const studentEmail = process.env.STUDENT_EMAIL?.toLowerCase();
-    const studentPassword = process.env.STUDENT_PASSWORD;
-
-    if (adminEmail && adminPassword && email.toLowerCase() === adminEmail) {
-      if (password !== adminPassword) {
-        return res.status(401).json({ message: 'Invalid email or password.' });
-      }
-
-      const adminUser = {
-        id: '000000000000000000000001',
-        name: 'Administrator',
-        email: adminEmail,
-        role: 'admin',
-      };
-
-      return res.json({
-        user: adminUser,
-        token: generateToken(adminUser),
-      });
-    }
-
-    if (studentEmail && studentPassword && email.toLowerCase() === studentEmail) {
-      if (password !== studentPassword) {
-        return res.status(401).json({ message: 'Invalid email or password.' });
-      }
-
-      const demoStudent = {
-        id: '000000000000000000000002',
-        name: 'Demo Student',
-        email: studentEmail,
-        role: 'user',
-      };
-
-      return res.json({
-        user: demoStudent,
-        token: generateToken(demoStudent),
-      });
     }
 
     const user = await User.findOne({ email });

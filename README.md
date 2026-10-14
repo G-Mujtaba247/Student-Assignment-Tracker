@@ -36,7 +36,7 @@ Create the client environment file only when the API is not available through th
 Copy-Item client/.env.example client/.env
 ```
 
-Update `server/.env` with a strong `JWT_SECRET` and your MongoDB connection string. The optional demo credentials can be set there as well.
+Update `server/.env` with a strong `JWT_SECRET` and your MongoDB connection string.
 
 ## Run In Development
 
