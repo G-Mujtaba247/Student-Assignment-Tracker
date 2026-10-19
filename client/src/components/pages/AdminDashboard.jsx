@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../api.js';
-import Header from '../components/Header.jsx';
+import api from '../../api.js';
+import Header from '../Header.jsx';
+import QuizManager from '../QuizManager.jsx';
 import toast, { Toaster } from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import './AdminDashboard.css';
@@ -200,6 +201,15 @@ function AdminDashboard() {
                 📋 Assignments
                 <span className="tab-badge">{assignments.length}</span>
               </button>
+              <button
+                role="tab"
+                aria-selected={activeTab === 'quizzes'}
+                className={`tab-btn ${activeTab === 'quizzes' ? 'active' : ''}`}
+                onClick={() => setActiveTab('quizzes')}
+                id="tab-quizzes"
+              >
+                📝 Quizzes
+              </button>
             </div>
 
             {loading ? (
@@ -306,6 +316,7 @@ function AdminDashboard() {
                               {a.description && (
                                 <p className="description-text">{a.description}</p>
                               )}
+
                               <div className="assignment-meta">
                                 📅 <strong>Due:</strong> {formatDate(a.dueDate)}
                               </div>
@@ -329,6 +340,22 @@ function AdminDashboard() {
                         <p>Try a different search term.</p>
                       </div>
                     )}
+                  </section>
+                )}
+
+                {activeTab === 'quizzes' && (
+                  <section className="admin-section" aria-labelledby="tab-quizzes">
+                    <QuizManager
+                      onPublished={({ configured, sent, failed }) => {
+                        if (!configured) {
+                          showMessage('Quiz published, but email was not sent. Configure SMTP settings to notify students.', true);
+                        } else if (failed) {
+                          showMessage(`Quiz published. Email sent to ${sent} student(s); ${failed} notification(s) failed.`, true);
+                        } else {
+                          showMessage(`Quiz published. Email sent to ${sent} student(s).`);
+                        }
+                      }}
+                    />
                   </section>
                 )}
               </>

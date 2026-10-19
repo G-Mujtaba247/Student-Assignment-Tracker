@@ -8,6 +8,8 @@ A full-stack assignment tracker with separate student and administrator workflow
 - Create, edit, filter, sort, and delete assignments
 - Switch between list and Kanban board views
 - Start and submit student work
+- Publish multiple-choice quizzes to all registered students
+- Email quiz announcements, enforce a three-day deadline, and automatically grade attempts with a 75% passing score
 - Administrator dashboard for managing assignments and users
 - Rate-limited authentication endpoints
 
@@ -36,7 +38,7 @@ Create the client environment file only when the API is not available through th
 Copy-Item client/.env.example client/.env
 ```
 
-Update `server/.env` with a strong `JWT_SECRET` and your MongoDB connection string.
+Update `server/.env` with a strong `JWT_SECRET`, your MongoDB connection string, and SMTP settings (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, and `SMTP_PASS`) to send quiz announcement emails. Set `SMTP_SECURE=true` when your mail provider requires implicit TLS, and optionally set `SMTP_FROM` to the desired sender address. Quiz publishing remains available without SMTP settings, but email delivery will be reported as unavailable.
 
 ## Run In Development
 

@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../api.js';
-import Header from '../components/Header.jsx';
-import AssignmentForm from '../components/AssignmentForm.jsx';
-import AssignmentList from '../components/AssignmentList.jsx';
-import KanbanBoard from '../components/KanbanBoard.jsx';
+import api from '../../api.js';
+import Header from '../Header.jsx';
+import AssignmentForm from '../AssignmentForm.jsx';
+import AssignmentList from '../AssignmentList.jsx';
+import KanbanBoard from '../KanbanBoard.jsx';
+import QuizzesSection from '../QuizzesSection.jsx';
 import toast, { Toaster } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import './Dashboard.css';
@@ -211,6 +212,8 @@ function Dashboard() {
               <SummaryCard label="In Progress" value={summary.inProgress} icon="🚀" variant="progress" />
               <SummaryCard label="Completed"   value={summary.completed}  icon="✅" variant="done"     />
             </div>
+
+            {user?.role === 'user' && <QuizzesSection />}
 
             {/* ── Filter & Search ── */}
             <div className="filter-section">
