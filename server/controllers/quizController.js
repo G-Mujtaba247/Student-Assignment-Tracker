@@ -52,7 +52,8 @@ export const createQuiz = async (req, res, next) => {
     const normalizedQuestions = [];
     for (const [index, question] of questions.entries()) {
       if (
-        typeof question.prompt !== 'string'
+        !question
+        || typeof question.prompt !== 'string'
         || !question.prompt.trim()
         || !Array.isArray(question.options)
         || question.options.length < 2

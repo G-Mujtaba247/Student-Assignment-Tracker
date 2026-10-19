@@ -68,7 +68,7 @@ export default function QuizzesSection() {
   };
 
   const sortedQuizzes = [...quizzes].sort((a, b) => (
-    Number(a.expiresAt <= now) - Number(b.expiresAt <= now)
+    Number(new Date(a.expiresAt).getTime() <= now) - Number(new Date(b.expiresAt).getTime() <= now)
     || new Date(b.publishedAt) - new Date(a.publishedAt)
   ));
 

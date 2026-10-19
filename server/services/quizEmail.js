@@ -38,9 +38,9 @@ export const notifyStudentsOfQuiz = async (students, quiz) => {
   const sent = results.filter(result => result.status === 'fulfilled').length;
   const failed = results.length - sent;
   if (failed) {
-    results.forEach((result, index) => {
+    results.forEach(result => {
       if (result.status === 'rejected') {
-        console.error(`Quiz notification failed for ${students[index].email}:`, result.reason);
+        console.error('Quiz email notification failed:', result.reason);
       }
     });
   }
