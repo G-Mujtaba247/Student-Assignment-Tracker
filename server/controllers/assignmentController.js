@@ -17,6 +17,10 @@ export const getAssignments = async (req, res, next) => {
 
 export const createAssignment = async (req, res, next) => {
   try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Admin access required.' });
+    }
+
     const { title, description, dueDate, studentName, status } = req.body;
 
     if (!title) {
@@ -48,19 +52,31 @@ export const updateAssignment = async (req, res, next) => {
       return res.status(404).json({ message: 'Assignment not found.' });
     }
 
-    if (req.user.role === 'admin' && assignment.createdBy.toString() !== req.user.id) {
-      return res.status(403).json({ message: 'Not authorized to update this assignment.' });
+    if (req.user.role === 'admin') {
+      if (assignment.createdBy.toString() !== req.user.id) {
+        return res.status(403).json({ message: 'Not authorized to update this assignment.' });
+      }
+
+      const editableFields = ['title', 'description', 'dueDate', 'studentName', 'status'];
+      for (const field of editableFields) {
+        if (Object.hasOwn(req.body, field)) assignment[field] = req.body[field];
+      }
+    } else {
+      if (assignment.studentName !== req.user.name) {
+        return res.status(403).json({ message: 'Not authorized to update this assignment.' });
+      }
+
+      if (assignment.submitted) {
+        return res.status(403).json({ message: 'Cannot update a submitted assignment.' });
+      }
+
+      if (req.body.status !== 'in progress') {
+        return res.status(403).json({ message: 'Students can only start an assignment.' });
+      }
+
+      assignment.status = 'in progress';
     }
 
-    if (req.user.role === 'user' && assignment.studentName !== req.user.name) {
-      return res.status(403).json({ message: 'Not authorized to update this assignment.' });
-    }
-
-    if (req.user.role === 'user' && assignment.submitted) {
-      return res.status(403).json({ message: 'Cannot update a submitted assignment.' });
-    }
-
-    Object.assign(assignment, req.body);
     const updated = await assignment.save();
     res.json(updated);
   } catch (error) {
@@ -70,6 +86,10 @@ export const updateAssignment = async (req, res, next) => {
 
 export const deleteAssignment = async (req, res, next) => {
   try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Admin access required.' });
+    }
+
     const assignment = await Assignment.findById(req.params.id);
     if (!assignment) {
       return res.status(404).json({ message: 'Assignment not found.' });
@@ -88,6 +108,10 @@ export const deleteAssignment = async (req, res, next) => {
 
 export const submitAssignment = async (req, res, next) => {
   try {
+    if (req.user.role !== 'user') {
+      return res.status(403).json({ message: 'Student access required.' });
+    }
+
     const assignment = await Assignment.findById(req.params.id);
     if (!assignment) {
       return res.status(404).json({ message: 'Assignment not found.' });
