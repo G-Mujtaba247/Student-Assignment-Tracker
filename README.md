@@ -44,8 +44,10 @@ Update `server/.env` with a strong `JWT_SECRET`, your MongoDB connection string,
 
 Public registration creates student accounts only. Register the account that should administer the tracker, then promote it directly in MongoDB:
 
+Use the same MongoDB connection string configured in `server/.env`. For the default local setup:
+
 ```powershell
-mongosh "$env:MONGO_URI"
+mongosh "mongodb://127.0.0.1:27017/student-assignment-tracker"
 ```
 
 In the MongoDB shell, replace the email with the registered account's email:
