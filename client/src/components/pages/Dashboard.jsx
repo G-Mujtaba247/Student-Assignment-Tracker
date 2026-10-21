@@ -260,24 +260,26 @@ function Dashboard() {
                 >
                   {viewMode === 'list' ? '📋 Board View' : '📄 List View'}
                 </button>
-                <button
-                  className={`toggle-form-btn ${showForm ? 'is-open' : ''}`}
-                  onClick={() => showForm ? handleCloseForm() : setShowForm(true)}
-                  id="toggle-form-btn"
-                  aria-expanded={showForm}
-                >
-                  {showForm ? (
-                    <><span>✕</span> Close form</>
-                  ) : (
-                    <><span>＋</span> New assignment</>
-                  )}
-                </button>
+                {user?.role === 'admin' && (
+                  <button
+                    className={`toggle-form-btn ${showForm ? 'is-open' : ''}`}
+                    onClick={() => showForm ? handleCloseForm() : setShowForm(true)}
+                    id="toggle-form-btn"
+                    aria-expanded={showForm}
+                  >
+                    {showForm ? (
+                      <><span>✕</span> Close form</>
+                    ) : (
+                      <><span>＋</span> New assignment</>
+                    )}
+                  </button>
+                )}
               </div>
             </div>
 
             {/* ── Assignment Form ── */}
             <AnimatePresence>
-            {showForm && (
+            {showForm && user?.role === 'admin' && (
               <AssignmentForm
                 initialData={editingAssignment}
                 onAdd={handleAdd}
@@ -301,6 +303,7 @@ function Dashboard() {
             ) : viewMode === 'list' ? (
               <AssignmentList
                 assignments={filteredAssignments}
+                userRole={user?.role}
                 onEdit={handleEdit}
                 onUpdate={handleUpdate}
                 onDelete={handleDelete}
@@ -308,6 +311,7 @@ function Dashboard() {
             ) : (
               <KanbanBoard 
                 assignments={filteredAssignments}
+                userRole={user?.role}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 onStatusChange={handleStatusChange}

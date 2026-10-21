@@ -40,6 +40,25 @@ Copy-Item client/.env.example client/.env
 
 Update `server/.env` with a strong `JWT_SECRET`, your MongoDB connection string, and SMTP settings (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, and `SMTP_PASS`) to send quiz announcement emails. Set `SMTP_SECURE=true` when your mail provider requires implicit TLS, and optionally set `SMTP_FROM` to the desired sender address. Quiz publishing remains available without SMTP settings, but email delivery will be reported as unavailable.
 
+### Create the First Administrator
+
+Public registration creates student accounts only. Register the account that should administer the tracker, then promote it directly in MongoDB:
+
+```powershell
+mongosh "$env:MONGO_URI"
+```
+
+In the MongoDB shell, replace the email with the registered account's email:
+
+```javascript
+db.users.updateOne(
+	{ email: "admin@example.com" },
+	{ $set: { role: "admin" } }
+)
+```
+
+Confirm the result reports `matchedCount: 1`, then sign out and sign back in so the dashboard reflects the new role. Do not add public role selection to registration.
+
 ## Run In Development
 
 Start both the API and Vite development server:

@@ -33,7 +33,7 @@ function formatDate(dateStr) {
 }
 
 /* ── Main Component ── */
-function AssignmentList({ assignments, onEdit, onUpdate, onDelete }) {
+function AssignmentList({ assignments, userRole, onEdit, onUpdate, onDelete }) {
   const [submitTarget, setSubmitTarget] = useState(null);
 
   const startWorking = async assignment => {
@@ -137,7 +137,26 @@ function AssignmentList({ assignments, onEdit, onUpdate, onDelete }) {
 
             {/* Action buttons */}
             <div className="action-row">
-              {item.submitted ? (
+              {userRole === 'admin' ? (
+                <>
+                  <button
+                    onClick={() => onEdit(item)}
+                    className="secondary"
+                    title="Edit assignment"
+                    id={`edit-btn-${item._id}`}
+                  >
+                    ✏️ Edit
+                  </button>
+                  <button
+                    onClick={() => removeAssignment(item._id)}
+                    className="danger"
+                    title="Delete assignment"
+                    id={`delete-btn-${item._id}`}
+                  >
+                    🗑️ Delete
+                  </button>
+                </>
+              ) : item.submitted ? (
                 <p className="read-only-note" role="note">
                   🔒 Submitted — read-only
                 </p>
@@ -163,22 +182,6 @@ function AssignmentList({ assignments, onEdit, onUpdate, onDelete }) {
                       ✅ Submit
                     </button>
                   )}
-                  <button
-                    onClick={() => onEdit(item)}
-                    className="secondary"
-                    title="Edit assignment"
-                    id={`edit-btn-${item._id}`}
-                  >
-                    ✏️ Edit
-                  </button>
-                  <button
-                    onClick={() => removeAssignment(item._id)}
-                    className="danger"
-                    title="Delete assignment"
-                    id={`delete-btn-${item._id}`}
-                  >
-                    🗑️ Delete
-                  </button>
                 </>
               )}
             </div>

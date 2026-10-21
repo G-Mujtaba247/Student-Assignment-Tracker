@@ -14,7 +14,7 @@ function formatDate(dateStr) {
   });
 }
 
-function KanbanBoard({ assignments, onStatusChange, onEdit, onDelete }) {
+function KanbanBoard({ assignments, userRole, onStatusChange, onEdit, onDelete }) {
   
   const handleDragEnd = (result) => {
     if (!result.destination) return;
@@ -53,7 +53,12 @@ function KanbanBoard({ assignments, onStatusChange, onEdit, onDelete }) {
                     ref={provided.innerRef}
                   >
                     {colAssignments.map((item, index) => (
-                      <Draggable key={item._id} draggableId={item._id} index={index} isDragDisabled={item.submitted}>
+                      <Draggable
+                        key={item._id}
+                        draggableId={item._id}
+                        index={index}
+                        isDragDisabled={userRole !== 'admin' || item.submitted}
+                      >
                         {(provided, snapshot) => (
                           <div
                             ref={provided.innerRef}
@@ -74,7 +79,7 @@ function KanbanBoard({ assignments, onStatusChange, onEdit, onDelete }) {
                               <div className="kanban-card-footer">
                                 <span className="kanban-date">📅 {formatDate(item.dueDate)}</span>
                                 <div className="kanban-actions">
-                                  {!item.submitted && (
+                                  {userRole === 'admin' && (
                                     <>
                                       <button onClick={(e) => { e.stopPropagation(); onEdit(item); }} title="Edit">✏️</button>
                                       <button className="delete" onClick={(e) => { e.stopPropagation(); onDelete(item._id); }} title="Delete">🗑️</button>
